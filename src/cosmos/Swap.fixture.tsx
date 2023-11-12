@@ -13,7 +13,7 @@ import { CHAIN_NAMES_TO_IDS } from 'constants/chains'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useValue } from 'react-cosmos/fixture'
 
-import { DAI, USDC_MAINNET } from '../constants/tokens'
+import { DAI, GODZ, USDC_MAINNET } from '../constants/tokens'
 import EventFeed, { Event, HANDLERS } from './EventFeed'
 import useOption from './useOption'
 import useProvider from './useProvider'
@@ -33,7 +33,6 @@ const tokenLists: Record<string, TokenInfo[] | string> = {
   'Mainnet only': mainnetTokens,
   Logoless: [TOKEN_WITH_NO_LOGO],
 }
-
 function Fixture() {
   const [events, setEvents] = useState<Event[]>([])
   const useHandleEvent = useCallback(
@@ -49,6 +48,7 @@ function Fixture() {
       '0x1D9Cd50Dde9C19073B81303b3d930444d11552f7',
       '0x0dA5533d5a9aA08c1792Ef2B6a7444E149cCB0AD',
       '0xE6abE059E5e929fd17bef158902E73f0FEaCD68c',
+      '0x1068a889fd7151fb2ca9d98d268b0d0cd623fc2f',
     ],
   })
 
@@ -56,11 +56,12 @@ function Fixture() {
   const currencies: Record<string, string> = {
     Native: 'NATIVE',
     DAI: DAI.address,
+    GODZ: GODZ.address,
     USDC: USDC_MAINNET.address,
   }
   const defaultInputToken = useOption('defaultInputToken', { options: currencies, defaultValue: 'Native' })
   const [defaultInputAmount] = useValue('defaultInputAmount', { defaultValue: 0 })
-  const defaultOutputToken = useOption('defaultOutputToken', { options: currencies })
+  const defaultOutputToken = useOption('defaultOutputToken', { options: currencies, defaultValue: 'GODZ' })
   const [defaultOutputAmount] = useValue('defaultOutputAmount', { defaultValue: 0 })
 
   const [brandedFooter] = useValue('brandedFooter', { defaultValue: true })
@@ -70,7 +71,7 @@ function Fixture() {
   const [width] = useValue('width', { defaultValue: 360 })
 
   const [theme, setTheme] = useValue('theme', { defaultValue: defaultTheme })
-  const [darkMode] = useValue('darkMode', { defaultValue: false })
+  const [darkMode] = useValue('darkMode', { defaultValue: true })
   useEffect(() => setTheme((theme) => ({ ...theme, ...(darkMode ? darkTheme : lightTheme) })), [darkMode, setTheme])
 
   const defaultNetwork = useOption('defaultChainId', {
@@ -95,7 +96,6 @@ function Fixture() {
     () => HANDLERS.reduce((handlers, name) => ({ ...handlers, [name]: useHandleEvent(name) }), {}),
     [useHandleEvent]
   )
-
   const widget = (
     <SwapWidget
       permit2
